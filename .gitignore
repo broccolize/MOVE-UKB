@@ -70,3 +70,27 @@ docs/source/_templates/
 !/requirements.txt
 !/setup.cfg
 !/.github
+
+# === UKB project directories ===
+ukb/data/
+ukb/interim_data/
+ukb/results/
+ukb/logs/
+
+# Never commit the UKB dataset or generated latent outputs
+UKB_Protein_BL_withCov.csv
+*.tsv
+*.csv
+*.zip
+
+# Model artifacts
+*.pt
+*.pth
+*.ckpt
+
+# Local notebooks & analysis
+ukb/notebooks/
+
+# Hydra output folders (created by move-dl)
+multirun/
+outputs/

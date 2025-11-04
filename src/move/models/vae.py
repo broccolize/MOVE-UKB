@@ -1,6 +1,8 @@
 __all__ = ["VAE"]
 
 import logging
+logging.basicConfig(level=logging.INFO) #changed
+
 from typing import Callable, Optional
 
 import torch

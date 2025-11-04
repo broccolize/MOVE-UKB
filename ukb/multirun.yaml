@@ -1,0 +1,188 @@
+hydra:
+  run:
+    dir: ./
+  sweep:
+    dir: ./
+    subdir: ./
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+    params: null
+  help:
+    app_name: ${hydra.job.name}
+    header: '${hydra.help.app_name} is powered by Hydra.
+
+      '
+    footer: 'Powered by Hydra (https://hydra.cc)
+
+      Use --hydra-help to view Hydra specific help
+
+      '
+    template: '${hydra.help.header}
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (group=option)
+
+
+      $APP_CONFIG_GROUPS
+
+
+      == Config ==
+
+      Override anything in the config (foo.bar=value)
+
+
+      $CONFIG
+
+
+      ${hydra.help.footer}
+
+      '
+  hydra_help:
+    template: 'Hydra (${hydra.runtime.version})
+
+      See https://hydra.cc for more info.
+
+
+      == Flags ==
+
+      $FLAGS_HELP
+
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (For example, append hydra/job_logging=disabled
+      to command line)
+
+
+      $HYDRA_CONFIG_GROUPS
+
+
+      Use ''--cfg hydra'' to Show the Hydra config.
+
+      '
+    hydra_help: ???
+  hydra_logging:
+    version: 1
+    root: null
+    disable_existing_loggers: false
+  job_logging:
+    version: 1
+    root: null
+    disable_existing_loggers: false
+  env: {}
+  mode: MULTIRUN
+  searchpath:
+  - file://config/
+  callbacks: {}
+  output_subdir: null
+  overrides:
+    hydra:
+    - hydra.mode=MULTIRUN
+    task:
+    - data=ukb_proteomics
+    - task=analyze_latent
+    - task.model.cuda=True
+    - task.model.num_hidden=[512,256]
+    - task.model.num_latent=16
+    - task.training_loop.num_epochs=100
+  job:
+    name: __main__
+    chdir: null
+    override_dirname: data=ukb_proteomics;task.model.cuda=True;task.model.num_hidden=[512,256];task.model.num_latent=16;task.training_loop.num_epochs=100;task=analyze_latent
+    id: ???
+    num: ???
+    config_name: main
+    env_set: {}
+    env_copy: []
+    config:
+      override_dirname:
+        kv_sep: '='
+        item_sep: ;
+        exclude_keys:
+        - experiment
+  runtime:
+    version: 1.3.2
+    version_base: '1.2'
+    cwd: C:\NPU\Research\MOVE-UKB\ukb
+    config_sources:
+    - path: hydra.conf
+      schema: pkg
+      provider: hydra
+    - path: move.conf
+      schema: pkg
+      provider: main
+    - path: config/
+      schema: file
+      provider: hydra.searchpath in main
+    - path: ''
+      schema: structured
+      provider: schema
+    output_dir: ???
+    choices:
+      experiment: null
+      task: analyze_latent
+      data: ukb_proteomics
+      hydra/env: default
+      hydra/callbacks: null
+      hydra/job_logging: none
+      hydra/hydra_logging: none
+      hydra/hydra_help: default
+      hydra/help: default
+      hydra/sweeper: basic
+      hydra/launcher: basic
+      hydra/output: default
+  verbose: false
+seed: null
+data:
+  raw_data_path: data/
+  interim_data_path: interim_data/
+  results_path: results/
+  sample_names: ukb_ids
+  categorical_inputs:
+  - name: ukb_batch
+  - name: ukb_bloodsample_date_0_0
+  continuous_inputs:
+  - name: ukb_proteomics
+    log2: false
+    scale: true
+  - name: ukb_continuous
+    log2: false
+    scale: true
+  categorical_names: ${names:${data.categorical_inputs}}
+  continuous_names: ${names:${data.continuous_inputs}}
+  categorical_weights: ${weights:${data.categorical_inputs}}
+  continuous_weights: ${weights:${data.continuous_inputs}}
+task:
+  batch_size: 10
+  model:
+    _target_: move.models.vae.VAE
+    cuda: true
+    categorical_weights: ${weights:${data.categorical_inputs}}
+    continuous_weights: ${weights:${data.continuous_inputs}}
+    num_hidden:
+    - 512
+    - 256
+    num_latent: 16
+    beta: 0.0001
+    dropout: 0.1
+  training_loop:
+    _target_: move.training.training_loop.training_loop
+    num_epochs: 100
+    lr: 0.0001
+    kld_warmup_steps:
+    - 15
+    - 20
+    - 25
+    batch_dilation_steps:
+    - 50
+    - 100
+    - 150
+    early_stopping: false
+    patience: 0
+  feature_names: []
+  reducer:
+    _target_: sklearn.manifold.TSNE
