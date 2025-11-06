@@ -160,13 +160,13 @@ def plot_vae(
                         G.add_edge(
                             f"input_{k}",
                             f"encoder_hidden_{j}",
-                            weight=values.cpu().numpy()[j, k],
+                            weight=values.numpy()[j, k],
                         )
 
             elif layer == "encoderlayers.0.bias":
                 for j in range(values.shape[0]):  # encoder_hidden
                     G.add_edge(
-                        "input_bias", f"encoder_hidden_{j}", weight=values.cpu().numpy()[j]
+                        "input_bias", f"encoder_hidden_{j}", weight=values.numpy()[j]
                     )
 
             elif layer == "mu.weight":
@@ -175,12 +175,12 @@ def plot_vae(
                         G.add_edge(
                             f"encoder_hidden_{j}",
                             f"mu_{i}",
-                            weight=values.cpu().numpy()[i, j],
+                            weight=values.numpy()[i, j],
                         )
 
             elif layer == "mu.bias":
                 for i in range(values.shape[0]):  # encoder_hidden
-                    G.add_edge("mu_bias", f"mu_{i}", weight=values.cpu().numpy()[i])
+                    G.add_edge("mu_bias", f"mu_{i}", weight=values.numpy()[i])
 
             elif layer == "var.weight":
                 for j in range(values.shape[1]):  # encoder hidden
@@ -188,12 +188,12 @@ def plot_vae(
                         G.add_edge(
                             f"encoder_hidden_{j}",
                             f"var_{i}",
-                            weight=values.cpu().numpy()[i, j],
+                            weight=values.numpy()[i, j],
                         )
 
             elif layer == "var.bias":
                 for i in range(values.shape[0]):  # encoder_hidden
-                    G.add_edge("var_bias", f"var_{i}", weight=values.cpu().numpy()[i])
+                    G.add_edge("var_bias", f"var_{i}", weight=values.numpy()[i])
 
             # Sampled layer from mu and var:
             elif layer == "decoderlayers.0.weight":
@@ -202,14 +202,14 @@ def plot_vae(
                         G.add_edge(
                             f"sam_{i}",
                             f"decoder_hidden_{j}",
-                            weight=values.cpu().numpy()[j, i],
+                            weight=values.numpy()[j, i],
                         )
 
             # Sampled layer from mu and var:
             elif layer == "decoderlayers.0.bias":
                 for j in range(values.shape[0]):  # decoder_hidden
                     G.add_edge(
-                        "sam_bias", f"decoder_hidden_{j}", weight=values.cpu().numpy()[j]
+                        "sam_bias", f"decoder_hidden_{j}", weight=values.numpy()[j]
                     )
 
             elif layer == "out.weight":
@@ -218,12 +218,12 @@ def plot_vae(
                         G.add_edge(
                             f"output_{k}",
                             f"decoder_hidden_{j}",
-                            weight=values.cpu().numpy()[k, j],
+                            weight=values.numpy()[k, j],
                         )
 
             elif layer == "out.bias":
                 for k in range(values.shape[0]):  # output
-                    G.add_edge("out_bias", f"output_{k}", weight=values.cpu().numpy()[k])
+                    G.add_edge("out_bias", f"output_{k}", weight=values.numpy()[k])
 
     fig = plt.figure(figsize=(60, 60))
     pos = nx.get_node_attributes(G, "pos")
