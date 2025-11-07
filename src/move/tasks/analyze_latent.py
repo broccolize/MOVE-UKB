@@ -146,6 +146,12 @@ def analyze_latent(config: MOVEConfig) -> None:
     reducer: TransformerMixin = hydra.utils.instantiate(task_config.reducer)
     embedding = reducer.fit_transform(latent_space)
 
+    # Save the full latent space (all dimensions)
+    latent_full_df = pd.DataFrame(latent_space, index=df_index)
+    latent_full_df.columns = [f"dim{i}" for i in range(latent_space.shape[1])]
+    latent_full_df.to_csv(output_path / "latent_space_full.tsv", sep="\t")
+    logger.info(f"Saved full latent matrix: {latent_space.shape} → latent_space_full.tsv")
+
     mappings_path = interim_path / "mappings.json"
     if mappings_path.exists():
         mappings = io.load_mappings(mappings_path)
