@@ -143,13 +143,30 @@ def tune_model(config: MOVEConfig) -> float:
                 mean_diff = np.mean(diff)
                 cosine_sim_diffs.append(mean_diff)
 
-        record = _get_record(
-            cosine_sim_diffs,
-            job_num=job_num,
-            **dict(label),
-            metric="mean_diff_cosine_similarity",
-            num_refits=task_config.num_refits,
-        )
+            # PREVIOUS CODE
+            #cosine_sim_diffs,
+            #job_num=job_num,
+            #**dict(label),
+            #metric="mean_diff_cosine_similarity",
+            #num_refits=task_config.num_refits,
+       
+            # Parse hydra labels safely for Hydra>=1.3 compatibility
+            raw_label = hydra_config.job.override_dirname
+            label_items = []
+            for part in raw_label.replace(";", ",").split(","):
+                if "=" in part:
+                    k, v = part.split("=", 1)
+                    label_items.append((k.strip(), v.strip()))
+            label_dict = dict(label_items)
+
+            record = _get_record(
+                cosine_sim_diffs,
+                job_num=job_num,
+                **label_dict,
+                metric="mean_diff_cosine_similarity",
+                num_refits=task_config.num_refits,
+            )
+
         logger.info("Writing results")
         df_path = output_path / "stability_stats.tsv"
         header = not df_path.exists()
