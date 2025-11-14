@@ -10,7 +10,7 @@ num_latent:
   - 250
   - 300
 
-target_dataset: baseline_drugs
+target_dataset: ukb_proteomics
 target_value: 1
 
 model:

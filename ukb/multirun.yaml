@@ -84,16 +84,20 @@ hydra:
     - hydra.mode=MULTIRUN
     task:
     - data=ukb_proteomics
-    - task=analyze_latent
+    - task=identify_associations_ks
     - task.model.cuda=True
     - task.model.num_hidden=[1024,512]
-    - task.model.num_latent=100
-    - task.training_loop.num_epochs=100
-    - +skip_feature_importance=True
+    - task.model.num_latent=64
+    - task.model.dropout=0.2
+    - task.model.beta=0.0005
+    - task.batch_size=256
+    - task.training_loop.num_epochs=200
+    - task.target_dataset=ukb_continuous
+    - +task.target_value=ProteinNum_0_0
   job:
     name: __main__
     chdir: null
-    override_dirname: +skip_feature_importance=True;data=ukb_proteomics;task.model.cuda=True;task.model.num_hidden=[1024,512];task.model.num_latent=100;task.training_loop.num_epochs=100;task=analyze_latent
+    override_dirname: +task.target_value=ProteinNum_0_0;data=ukb_proteomics;task.batch_size=256;task.model.beta=0.0005;task.model.cuda=True;task.model.dropout=0.2;task.model.num_hidden=[1024,512];task.model.num_latent=64;task.target_dataset=ukb_continuous;task.training_loop.num_epochs=200;task=identify_associations_ks
     id: ???
     num: ???
     config_name: main
@@ -125,7 +129,7 @@ hydra:
     output_dir: ???
     choices:
       experiment: null
-      task: analyze_latent
+      task: identify_associations_ks
       data: ukb_proteomics
       hydra/env: default
       hydra/callbacks: null
@@ -153,12 +157,13 @@ data:
   - name: ukb_continuous
     log2: false
     scale: true
+  target_dataset: ukb_proteomics
   categorical_names: ${names:${data.categorical_inputs}}
   continuous_names: ${names:${data.continuous_inputs}}
   categorical_weights: ${weights:${data.categorical_inputs}}
   continuous_weights: ${weights:${data.continuous_inputs}}
 task:
-  batch_size: 10
+  batch_size: 256
   model:
     _target_: move.models.vae.VAE
     cuda: true
@@ -167,12 +172,12 @@ task:
     num_hidden:
     - 1024
     - 512
-    num_latent: 100
-    beta: 0.0001
-    dropout: 0.1
+    num_latent: 64
+    beta: 0.0005
+    dropout: 0.2
   training_loop:
     _target_: move.training.training_loop.training_loop
-    num_epochs: 100
+    num_epochs: 200
     lr: 0.0001
     kld_warmup_steps:
     - 15
@@ -184,7 +189,10 @@ task:
     - 150
     early_stopping: false
     patience: 0
-  feature_names: []
-  reducer:
-    _target_: sklearn.manifold.TSNE
-skip_feature_importance: true
+  target_dataset: ukb_continuous
+  target_value: ProteinNum_0_0
+  num_refits: 5
+  sig_threshold: 0.05
+  save_refits: false
+  perturbed_feature_names: []
+  target_feature_names: []

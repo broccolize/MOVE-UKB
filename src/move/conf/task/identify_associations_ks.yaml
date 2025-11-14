@@ -24,3 +24,6 @@ training_loop:
     - 25
   early_stopping: false
   patience: 0
+
+num_refits: 5
+target_dataset: baseline_continuous
