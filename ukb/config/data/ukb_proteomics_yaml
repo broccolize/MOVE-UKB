@@ -1,0 +1,23 @@
+# raw - for raw data (e.g., TSVs, text)
+# interim - for intermediate data (e.g., NPYs, trained models, latents)
+# processed - for results (e.g., TSVs)
+raw_data_path: data/
+interim_data_path: interim_data/
+results_path: results/
+
+sample_names: ukb_ids
+
+categorical_inputs:
+  - name: ukb_batch
+  - name: ukb_bloodsample_date_0_0
+
+continuous_inputs:
+  - name: ukb_proteomics
+    log2: false
+    scale: true
+  - name: ukb_continuous
+    log2: false
+    scale: true
+
+target_dataset: ukb_proteomics
+
