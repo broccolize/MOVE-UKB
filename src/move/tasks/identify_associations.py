@@ -42,6 +42,9 @@ from move.visualization.dataset_distributions import (
 TaskType = Literal["bayes", "ttest", "ks"]
 CONTINUOUS_TARGET_VALUE = ["minimum", "maximum", "plus_std", "minus_std"]
 
+# --- UKB compatibility patch ---
+CONTINUOUS_DATASETS = ["baseline_continuous", "ukb_continuous"]
+CATEGORICAL_DATASETS = ["baseline_drugs", "baseline_categorical", "ukb_batch", "ukb_bloodsample_date_0_0"]
 
 def _get_task_type(
     task_config: IdentifyAssociationsConfig,
@@ -792,7 +795,8 @@ def identify_associations(config: MOVEConfig) -> None:
 
     # Indentify associations between continuous features:
     logger.info(f"Perturbing dataset: '{task_config.target_dataset}'")
-    if task_config.target_value in CONTINUOUS_TARGET_VALUE:
+    if (task_config.target_value in CONTINUOUS_TARGET_VALUE or task_config.target_dataset in CONTINUOUS_DATASETS):
+        #changed the top line to include UKB compatibility patch
         logger.info(f"Beginning task: identify associations continuous ({task_type})")
         logger.info(f"Perturbation type: {task_config.target_value}")
         output_subpath = Path(output_path) / "perturbation_visualization"
